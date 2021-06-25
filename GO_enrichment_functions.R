@@ -6,9 +6,13 @@ require(magrittr)
 require(org.Hs.eg.db)
 require(tibble)
 require(annotate)
+require(AnnotationDbi)
+require(GO.db)
 library(docstring) # for python-esque docstring - optional
 
 #### Functions
+
+
 create_geneBackground <- function(source_data, column_of_gene_symbols) {
   
   #' @description
@@ -44,7 +48,7 @@ create_geneSets_GO <- function(geneBackground_list, min_GO_group_size, max_GO_gr
   # Create GO object
   go_object <- as.list(org.Hs.egGO2ALLEGS)
   # Get gene_symbols in GO_object
-  symbols_in_gO <- getSYMBOL(unique(unlist(go_object)), data=goSource)
+  symbols_in_GO <- getSYMBOL(unique(unlist(go_object)), data='org.Hs.eg')
     
   #build GO sets for tmod -slow
   tmod_names <- data.frame()
@@ -60,7 +64,7 @@ create_geneSets_GO <- function(geneBackground_list, min_GO_group_size, max_GO_gr
     # Select by go_group_name
     go_group <- go_object[go_group_name]
     gene_IDs <- unique(unlist(go_group, use.names=F))  #discard evidence codes
-    gene_symbols <- unique(getSYMBOL(gene_IDs, data=goSource))
+    gene_symbols <- unique(getSYMBOL(gene_IDs, data='org.Hs.eg'))
     #get size after intersecting with our full gene set
     genesymbols <- intersect(gene_symbols, geneBackground_list) 
     if (!(length(gene_symbols) >= min_GO_group_size & length(gene_symbols) <= max_GO_group_size)) next();
